@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNTITLED POKER — Web Multiplayer (Hold'em & Baccarat)</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <canvas id="swirl-bg" width="240" height="135"></canvas>
+  <div id="crt-overlay" class="crt-on"></div>
+
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-title">UNTITLED POKER</span>
+        <span id="header-info" class="brand-sub">WEB SERVER // UP TO 10 PLAYERS</span>
+      </div>
+      <div class="top-actions">
+        <button id="btn-switch-mode" class="btn btn-purple hidden">SWITCH MODE</button>
+        <button id="btn-to-lobby" class="btn btn-blue hidden">LOBBY</button>
+        <button id="btn-copy-link" class="btn btn-gold hidden">COPY INVITE</button>
+        <button id="btn-hide-ip" class="btn btn-dark">HIDE IP: OFF</button>
+        <button id="btn-crt" class="btn btn-dark">CRT: ON</button>
+        <button id="btn-leave" class="btn btn-red hidden">LEAVE</button>
+      </div>
+    </header>
+
+    <!-- HOME SCREEN -->
+    <main id="view-home" class="view">
+      <div class="hero-cards" id="hero-cards"></div>
+      <h1 class="hero-title">UNTITLED POKER</h1>
+      <p class="hero-sub">TEXAS HOLD'EM &amp; BACCARAT // STANDALONE WEB SERVER // 10 PLAYERS</p>
+
+      <div class="home-grid">
+        <section class="panel">
+          <h2 class="panel-title">HOST OR JOIN A ROOM</h2>
+
+          <label class="field-label">PLAYER NAME</label>
+          <input id="inp-name" class="pixel-input" maxlength="14" value="ACE" placeholder="YOUR NAME" />
+
+          <div class="split-row">
+            <div>
+              <label class="field-label">ROOM NAME (FOR HOSTING)</label>
+              <input id="inp-room-name" class="pixel-input" maxlength="24" value="FRIDAY NIGHT TABLE" />
+            </div>
+            <div>
+              <label class="field-label">GAME MODE</label>
+              <select id="sel-mode" class="pixel-input">
+                <option value="0">TEXAS HOLD'EM</option>
+                <option value="2">OMAHA HOLD'EM</option>
+                <option value="1">BACCARAT</option>
+                <option value="3">GUTS POKER</option>
+                <option value="4">21 / BLACKJACK</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bot-setup-row">
+            <button id="btn-home-bots" class="btn btn-purple">BOTS: ON</button>
+            <button id="btn-home-bot-dec" class="btn btn-dark">-</button>
+            <span id="lbl-home-bots" class="gold-label">COUNT: 3</span>
+            <button id="btn-home-bot-inc" class="btn btn-dark">+</button>
+            <label class="check-label">
+              <input type="checkbox" id="chk-private" /> PRIVATE
+            </label>
+          </div>
+
+          <button id="btn-create-room" class="btn btn-green btn-lg full-w">CREATE HOSTED ROOM</button>
+
+          <hr class="pixel-hr" />
+
+          <label class="field-label">JOIN BY ROOM CODE</label>
+          <div class="join-row">
+            <input id="inp-join-code" class="pixel-input code-input" maxlength="6" placeholder="E.G. K7Q2M" />
+            <button id="btn-join-code" class="btn btn-blue">JOIN ROOM</button>
+          </div>
+
+          <p id="home-status" class="status-text">READY — CREATE A ROOM OR ENTER A FRIEND'S ROOM CODE</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header-row">
+            <h2 class="panel-title">PUBLIC ROOMS ON THIS SERVER</h2>
+            <button id="btn-refresh-rooms" class="btn btn-dark btn-sm">REFRESH</button>
+          </div>
+          <div id="public-rooms-list" class="rooms-list">
+            <p class="muted">Loading rooms...</p>
+          </div>
+          <div class="server-addr-box">
+            <span class="muted">SERVER URL:</span>
+            <span id="lbl-server-url" class="gold-label"></span>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- LOBBY SCREEN -->
+    <main id="view-lobby" class="view hidden">
+      <div class="lobby-grid">
+        <section class="panel">
+          <div class="panel-header-row">
+            <h2 id="lobby-title" class="panel-title">PLAYERS (1/10)</h2>
+            <span id="lobby-code-badge" class="code-badge">CODE: -----</span>
+          </div>
+          <p id="lobby-seat-hint" class="muted small">Host can click any open seat to place a bot or remove a bot from a specific seat.</p>
+          <div id="lobby-seats" class="lobby-seats-grid"></div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">GAME SETTINGS</h2>
+
+          <div class="setting-group">
+            <span class="field-label">GAME MODE</span>
+            <div class="btn-row">
+              <button data-mode="0" class="btn btn-green btn-mode">HOLD'EM</button>
+              <button data-mode="2" class="btn btn-dark btn-mode">OMAHA</button>
+              <button data-mode="1" class="btn btn-dark btn-mode">BACCARAT</button>
+              <button data-mode="3" class="btn btn-dark btn-mode">GUTS</button>
+              <button data-mode="4" class="btn btn-dark btn-mode">21 / BJ</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <span id="lbl-blinds" class="field-label">BLINDS: $10/$20</span>
+            <div class="btn-row">
+              <button data-blinds="10,20" class="btn btn-blue btn-blind">$10/$20</button>
+              <button data-blinds="25,50" class="btn btn-blue btn-blind">$25/$50</button>
+              <button data-blinds="50,100" class="btn btn-blue btn-blind">$50/$100</button>
+            </div>
+          </div>
+
+          <div id="host-bot-controls" class="setting-group">
+            <span id="lbl-lobby-bots" class="field-label">AI BOTS: 0/9</span>
+            <div class="btn-row">
+              <button id="btn-bot-dec" class="btn btn-orange">-</button>
+              <button id="btn-bot-inc" class="btn btn-purple">+</button>
+              <button id="btn-bot-none" class="btn btn-red">NONE</button>
+              <button id="btn-bot-fill" class="btn btn-blue">FILL</button>
+            </div>
+          </div>
+
+          <button id="btn-start-game" class="btn btn-green btn-lg full-w">DEAL / START GAME</button>
+          <p id="lobby-wait-msg" class="gold-label hidden">WAITING FOR HOST TO START...</p>
+
+          <div class="chat-panel">
+            <div id="lobby-log" class="log-box"></div>
+            <div class="chat-row">
+              <input id="inp-lobby-chat" class="pixel-input" maxlength="80" placeholder="CHAT MESSAGE..." />
+              <button id="btn-lobby-chat" class="btn btn-dark">SEND</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- TEXAS HOLD'EM TABLE -->
+    <main id="view-holdem" class="view hidden">
+      <div class="holdem-stage">
+        <div class="poker-felt">
+          <div id="holdem-pot" class="pot-pill">POT: $0</div>
+          <div id="holdem-community" class="community-row"></div>
+          <div id="holdem-banner" class="table-banner">TEXAS HOLD'EM</div>
+        </div>
+        <div id="holdem-seats" class="oval-seats"></div>
+      </div>
+
+      <footer class="action-bar" id="holdem-action-bar"></footer>
+    </main>
+
+    <!-- BACCARAT TABLE -->
+    <main id="view-baccarat" class="view hidden">
+      <div class="baccarat-hands">
+        <section id="bac-player-panel" class="panel bac-hand-panel blue-border">
+          <div class="panel-header-row">
+            <h2 class="hand-title blue-text">PLAYER HAND</h2>
+            <span id="bac-player-score" class="score-badge">-</span>
+          </div>
+          <div id="bac-player-cards" class="bac-cards-row"></div>
+        </section>
+
+        <div class="vs-center">
+          <div class="vs-badge">VS</div>
+          <div id="bac-shoe" class="muted small">SHOE: 416/416</div>
+        </div>
+
+        <section id="bac-banker-panel" class="panel bac-hand-panel red-border">
+          <div class="panel-header-row">
+            <h2 class="hand-title red-text">BANKER HAND</h2>
+            <span id="bac-banker-score" class="score-badge">-</span>
+          </div>
+          <div id="bac-banker-cards" class="bac-cards-row"></div>
+        </section>
+      </div>
+
+      <div id="bac-banner" class="table-banner center-banner">PLACE YOUR BETS</div>
+
+      <div class="bac-zones">
+        <button data-bet="0" class="btn btn-blue bac-zone">PLAYER 1:1<span class="zone-amt" id="z-amt-0">$0</span></button>
+        <button data-bet="2" class="btn btn-green bac-zone">TIE 8:1<span class="zone-amt" id="z-amt-2">$0</span></button>
+        <button data-bet="1" class="btn btn-red bac-zone">BANKER 0.95:1<span class="zone-amt" id="z-amt-1">$0</span></button>
+        <button data-bet="3" class="btn btn-purple bac-zone">P. PAIR 11:1<span class="zone-amt" id="z-amt-3">$0</span></button>
+        <button data-bet="4" class="btn btn-orange bac-zone">B. PAIR 11:1<span class="zone-amt" id="z-amt-4">$0</span></button>
+      </div>
+
+      <div class="panel bac-strip">
+        <span class="muted small">HISTORY:</span>
+        <div id="bac-history" class="bead-plate"></div>
+      </div>
+
+      <div id="bac-seats" class="panel bac-seats-strip"></div>
+
+      <footer class="action-bar" id="bac-action-bar">
+        <div class="bac-chips-info">
+          <span id="bac-my-chips" class="gold-label">CHIPS: $1000</span>
+          <span id="bac-my-wager" class="white-label">WAGER: $0</span>
+        </div>
+        <div class="chip-picker">
+          <button data-chip="10" class="chip chip-blue active">$10</button>
+          <button data-chip="25" class="chip chip-green">$25</button>
+          <button data-chip="100" class="chip chip-red">$100</button>
+          <button data-chip="500" class="chip chip-purple">$500</button>
+        </div>
+        <div class="bac-controls" id="bac-controls"></div>
+      </footer>
+    </main>
+
+    <!-- GUTS POKER TABLE -->
+    <main id="view-guts" class="view hidden">
+      <div class="holdem-stage">
+        <div class="poker-felt">
+          <div id="guts-pot" class="pot-pill">GUTS POT: $0</div>
+          <div id="guts-banner" class="table-banner">GUTS POKER - IN OR OUT</div>
+        </div>
+        <div id="guts-seats" class="oval-seats"></div>
+      </div>
+      <footer class="action-bar" id="guts-action-bar"></footer>
+    </main>
+
+    <!-- 21 / BLACKJACK TABLE -->
+    <main id="view-blackjack" class="view hidden">
+      <section class="panel" style="margin-bottom:10px;border-color:var(--gold)">
+        <div class="panel-header-row">
+          <h2 id="bj-dealer-title" class="panel-title" style="margin:0">DEALER</h2>
+          <span id="bj-shoe" class="muted small">SHOE: 312/312</span>
+        </div>
+        <div id="bj-dealer-cards" class="bac-cards-row"></div>
+      </section>
+      <div id="bj-banner" class="table-banner center-banner">PLACE YOUR 21 / BLACKJACK BETS</div>
+      <div id="bj-seats" class="lobby-seats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:10px"></div>
+      <footer class="action-bar" id="bj-action-bar"></footer>
+    </main>
+
+    <!-- PERSISTENT SAM VOICE CHAT BAR (Visible in Lobby & All Game Tables) -->
+    <div id="sam-chat-bar" class="sam-chat-bar hidden">
+      <input id="inp-global-chat" class="pixel-input" maxlength="64" placeholder="TYPE TO SPEAK WITH SAM VOICE..." />
+      <label class="sam-pitch-wrap">
+        <span class="gold-label small">PITCH: <span id="lbl-sam-pitch">64</span></span>
+        <input id="rng-sam-pitch" type="range" min="25" max="130" value="64" />
+      </label>
+      <button id="btn-sam-toggle" class="btn btn-blue btn-sm">SAM: ON</button>
+      <button id="btn-global-chat" class="btn btn-green btn-sm">SAY</button>
+    </div>
+  </div>
+
+  <script src="/sam.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
