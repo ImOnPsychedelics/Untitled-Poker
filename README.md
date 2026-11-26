@@ -58,3 +58,13 @@ Then open `http://localhost:5080` (or share `http://<your-lan-ip>:5080` on LAN, 
 - **F1**: Toggle CRT scanline/vignette effect.
 - **F2**: Toggle **Hide IP** mode (masks your P2P host/join IP on screen).
 - **ESC**: Unfocus text input.
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=imonpsychedelics%2Funtitled-poker&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=imonpsychedelics/untitled-poker&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=imonpsychedelics/untitled-poker&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=imonpsychedelics/untitled-poker&type=date&legend=top-left" />
+ </picture>
+</a>
